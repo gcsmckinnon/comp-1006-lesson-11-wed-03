@@ -1,19 +1,41 @@
 <?php
 
   // Connect to the database
+  require("_connect.php");
+  $conn = dbo();
   
   // Create our SQL with an email placeholder
+  $sql = "SELECT * FROM users WHERE email = :email";
   
   // Prepare the SQL
+  $stmt = $conn->prepare($sql);
   
   // Bind the value to the placeholder (incidently this will also sanitize the value)
+  $email = filter_input(INPUT_POST, 'email', FILTER_VALIDATE_EMAIL);
+  $password = filter_input(INPUT_POST, 'password');
+  $email = strtolower($email);
+  $stmt->bindParam(":email", $email, PDO::PARAM_STR);
   
   // Execute
-  
-  // Check for errors
+  $stmt->execute();
 
   // Check if we have a user and their password is correct
+  $user = $stmt->fetch(PDO::FETCH_ASSOC);
 
-  // Add a session variable to keep track of the user
+  session_start();
+  $auth = false;
+  if (!$user) $auth = false;
+  else $auth = password_verify($password, $user['password']);
 
-  // Redirect back to the form
+  if (!$auth) {
+    $_SESSION['errors'][] = "Your email/password are incorrect.";
+    $_SESSION['form_values'] = $_POST;
+
+    header('Location: ./login.php');
+    exit();
+  }
+
+  $_SESSION['user'] = $user;
+  $_SESSION['successes'][] = "You have successfully logged in.";
+  header('Location: profile.php');
+  exit();

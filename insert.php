@@ -53,6 +53,9 @@
     if (empty($$field)) {
       $human_field = str_replace("_", " ", $field);
       $errors[] = "You cannot leave the {$human_field} blank.";
+    } else {
+      if ($field === "password" || $field === "password_confirmation") continue;
+      $$field = filter_var($$field, FILTER_SANITIZE_STRING);
     }
   }
 

@@ -1,8 +1,11 @@
 <?php
 
   // Before we render the form let's check for form values
+  session_start();
+  $form_values = $_SESSION['form_values'] ?? null;
 
   // Clear the form values
+  unset($_SESSION['form_values']);
   
 ?>
 
@@ -36,7 +39,7 @@
             <div class="col">
               <div class="form-group">
                 <label for="email">Email:</label>
-                <input class="form-control" type="email" name="email" placeholder="herman.munster@mockingbird.com" required">
+                <input class="form-control" type="email" name="email" placeholder="herman.munster@mockingbird.com" required value="<?= $form_values['email'] ?? null ?>">
               </div>
             </div>
             
