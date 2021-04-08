@@ -2,6 +2,11 @@
 
   // Before we render the form let's check for form values
   session_start();
+  if (isset($_SESSION['user'])) {
+    header("Location: profile.php");
+    exit();
+  }
+
   $form_values = $_SESSION['form_values'] ?? null;
 
   // Clear the form values

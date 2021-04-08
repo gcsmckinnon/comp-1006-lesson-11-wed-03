@@ -3,6 +3,11 @@
   // Connect to the database
   require("_connect.php");
   $conn = dbo();
+
+  // destructure our values
+  $email = filter_input(INPUT_POST, 'email', FILTER_VALIDATE_EMAIL);
+  $email = strtolower($email);
+  $password = filter_input(INPUT_POST, 'password');
   
   // Create our SQL with an email placeholder
   $sql = "SELECT * FROM users WHERE email = :email";
@@ -11,31 +16,27 @@
   $stmt = $conn->prepare($sql);
   
   // Bind the value to the placeholder (incidently this will also sanitize the value)
-  $email = filter_input(INPUT_POST, 'email', FILTER_VALIDATE_EMAIL);
-  $password = filter_input(INPUT_POST, 'password');
-  $email = strtolower($email);
-  $stmt->bindParam(":email", $email, PDO::PARAM_STR);
+  $stmt->bindParam(':email', $email, PDO::PARAM_STR);
   
   // Execute
   $stmt->execute();
 
   // Check if we have a user and their password is correct
   $user = $stmt->fetch(PDO::FETCH_ASSOC);
+  $auth = false;
+
+  if ($user) $auth = password_verify($password, $user['password']);
 
   session_start();
-  $auth = false;
-  if (!$user) $auth = false;
-  else $auth = password_verify($password, $user['password']);
-
   if (!$auth) {
-    $_SESSION['errors'][] = "Your email/password are incorrect.";
-    $_SESSION['form_values'] = $_POST;
+    $_SESSION["errors"][] = "Your email/password could not be verified.";
+    $_SESSION["form_values"] = $_POST;
 
-    header('Location: ./login.php');
+    header("Location: login.php");
     exit();
   }
 
-  $_SESSION['user'] = $user;
-  $_SESSION['successes'][] = "You have successfully logged in.";
-  header('Location: profile.php');
+  $_SESSION["user"] = $user;
+  $_SESSION["successes"][] = "You have logged in successfully.";
+  header("Location: profile.php");
   exit();

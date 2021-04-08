@@ -18,6 +18,7 @@
 
       return $db;
     } catch (PDOException $error) {
-      return "Issue connecting: {$error->getMessage()}";
+      var_dump("Issue connecting: {$error->getMessage()}");
+      exit();
     }
   }

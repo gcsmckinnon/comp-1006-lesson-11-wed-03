@@ -2,14 +2,14 @@
 
   // If they're not logged in, redirect them
   session_start();
-  if (!$_SESSION['user']) {
-    $_SESSION['errors'][] = "You must log in.";
+  if (!isset($_SESSION['user'])) {
+    $_SESSION["errors"][] = "Please login to access this content.";
     header("Location: login.php");
     exit();
   }
 
   // Assign the user
-  $user = $_SESSION['user'];
+  $user = $_SESSION["user"];
   
 ?>
 
@@ -47,7 +47,6 @@
       </header>
 
       <a class="btn" href="logout.php">Logout</a>
-      <a class="btn" href="deleteUser.php" onclick="return confirm('Are you sure?')">Delete Me</a>
     </div>
   </body>
 </html>
